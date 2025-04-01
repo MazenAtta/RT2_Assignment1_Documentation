@@ -28,7 +28,7 @@ from geometry_msgs.msg import Point  # To publish the last target
 
 class ActionClientNode:
     """
-    A ROS node that acts as an action client for sending goals to an action server.
+    A Class that acts as an action client for sending, canceling goals to an action server.
 
     Attributes:
         client (SimpleActionClient): The action client instance.
@@ -62,6 +62,10 @@ class ActionClientNode:
 
         Args:
             msg (Odometry): The odometry data from the /odom topic.
+        
+        Returns:
+            None
+
         """
         self.robot_state.x = msg.pose.pose.position.x
         self.robot_state.y = msg.pose.pose.position.y
@@ -78,6 +82,9 @@ class ActionClientNode:
         Args:
             x (float): The x-coordinate of the goal.
             y (float): The y-coordinate of the goal.
+        
+        Returns:
+            None
 
         Example:
             send_goal(1.0, 2.0)
@@ -101,6 +108,10 @@ class ActionClientNode:
 
         Args:
             feedback: The feedback data from the action server.
+
+        Returns:
+            None
+
         """
         rospy.loginfo(f"Feedback received: {feedback}")
 
@@ -109,6 +120,12 @@ class ActionClientNode:
         Cancel the current goal.
 
         *Action:* This function cancels any active goal that has been sent to the action server.
+
+        Args:
+            None
+
+        Returns:
+            None
 
         Example:
             cancel_goal()

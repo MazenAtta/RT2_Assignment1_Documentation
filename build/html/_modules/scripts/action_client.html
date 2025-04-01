@@ -97,7 +97,7 @@
 
 <div class="viewcode-block" id="ActionClientNode"><a class="viewcode-back" href="../../index.html#scripts.action_client.ActionClientNode">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ActionClientNode</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A ROS node that acts as an action client for sending goals to an action server.</span>
+<span class="sd">    A Class that acts as an action client for sending, canceling goals to an action server.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        client (SimpleActionClient): The action client instance.</span>
@@ -131,6 +131,10 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (Odometry): The odometry data from the /odom topic.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">robot_state</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">robot_state</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">pose</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span>
@@ -147,6 +151,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            x (float): The x-coordinate of the goal.</span>
 <span class="sd">            y (float): The y-coordinate of the goal.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">            send_goal(1.0, 2.0)</span>
@@ -170,6 +177,10 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            feedback: The feedback data from the action server.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rospy</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feedback received: </span><span class="si">{</span><span class="n">feedback</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
@@ -178,6 +189,12 @@
 <span class="sd">        Cancel the current goal.</span>
 
 <span class="sd">        *Action:* This function cancels any active goal that has been sent to the action server.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
 
 <span class="sd">        Example:</span>
 <span class="sd">            cancel_goal()</span>

@@ -128,7 +128,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="scripts.action_client.ActionClientNode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.action_client.</span></span><span class="sig-name descname"><span class="pre">ActionClientNode</span></span><a class="reference internal" href="_modules/scripts/action_client.html#ActionClientNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.action_client.ActionClientNode" title="Permalink to this definition"></a></dt>
-<dd><p>A ROS node that acts as an action client for sending goals to an action server.</p>
+<dd><p>A Class that acts as an action client for sending, canceling goals to an action server.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="scripts.action_client.ActionClientNode.client">
 <span class="sig-name descname"><span class="pre">client</span></span><a class="headerlink" href="#scripts.action_client.ActionClientNode.client" title="Permalink to this definition"></a></dt>
@@ -178,6 +178,14 @@
 <span class="sig-name descname"><span class="pre">cancel_goal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/action_client.html#ActionClientNode.cancel_goal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.action_client.ActionClientNode.cancel_goal" title="Permalink to this definition"></a></dt>
 <dd><p>Cancel the current goal.</p>
 <p><em>Action:</em> This function cancels any active goal that has been sent to the action server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 <p class="rubric">Example</p>
 <p>cancel_goal()</p>
 </dd></dl>
@@ -191,6 +199,9 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>feedback</strong> – The feedback data from the action server.</p>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -202,6 +213,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>msg</strong> (<em>Odometry</em>) – The odometry data from the /odom topic.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -236,6 +250,9 @@
 <li><p><strong>x</strong> (<em>float</em>) – The x-coordinate of the goal.</p></li>
 <li><p><strong>y</strong> (<em>float</em>) – The y-coordinate of the goal.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
@@ -301,6 +318,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>msg</strong> (<em>Point</em>) – The message containing the last target coordinates.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

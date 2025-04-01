@@ -48,6 +48,10 @@ def target_callback(msg):
 
     Args:
         msg (Point): The message containing the last target coordinates.
+    
+    Returns:
+        None
+
     """
     global last_target
     last_target["x"] = msg.x
