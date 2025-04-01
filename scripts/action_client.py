@@ -4,7 +4,7 @@
 .. module: action_client
    :platform: unix
    :synopsis: Python module for sending goals to an action server.
-.. moduleauthor:: MazenAtta mazenatta445@gmai.com
+.. moduleauthor:: MazenAtta
 
 ROS node that acts as an action client for sending goals to an action server.
 
@@ -33,11 +33,10 @@ def odom_callback(data):
     """
     Callback function to update the robot's position.
 
-    Args:
-        data (Odometry): The odometry data from the /odom topic.
+    *Important:* This function is called whenever a new message is received on the /odom topic. It updates the global variable `robot_position` with the latest position data.
 
-    Returns:
-    None
+    Args:
+        data (Odometry): The odometry data from the /odom topic, which includes the robot's current position and orientation.
     """
     global robot_position
     robot_position = data.pose.pose.position
@@ -47,14 +46,15 @@ def send_goal(client, x, y):
     """
     Send a goal to the action server.
 
+    *Action:* This function creates a new goal with the specified x and y coordinates and sends it to the action server through the action client.
+
     Args:
-        client (SimpleActionClient): The action client.
+        client (SimpleActionClient): The action client used to communicate with the action server.
         x (float): The x-coordinate of the goal.
         y (float): The y-coordinate of the goal.
-    
-    Returns:
-    None
 
+    Example:
+        send_goal(client, 1.0, 2.0)
     """
     goal = PlanningGoal()
     goal.target_pose.pose.position.x = x
@@ -67,12 +67,13 @@ def cancel_goal(client):
     """
     Cancel the current goal.
 
+    *Action:* This function cancels any active goal that has been sent to the action server.
+
     Args:
-        client (SimpleActionClient): The action client.
+        client (SimpleActionClient): The action client used to communicate with the action server.
 
-    Returns:
-    None
-
+    Example:
+        cancel_goal(client)
     """
     client.cancel_goal()
     rospy.loginfo("Goal cancelled.")
@@ -82,12 +83,18 @@ def main():
     """
     Main function to initialize the node and handle user input.
 
-    Args:
-    None
+    *Action:* This function initializes the ROS node, sets up the action client and subscribers, and handles user input to send or cancel goals.
 
-    Returns:
-    None
-    
+    Workflow:
+        1. Initialize the ROS node.
+        2. Set up the action client to communicate with the /reaching_goal action server.
+        3. Subscribe to the /odom topic to receive odometry data.
+        4. Create a publisher for custom feedback messages.
+        5. Enter a loop to handle user input for sending or canceling goals.
+        6. Monitor the goal's progress and publish feedback messages.
+
+    Example:
+        rosrun package_name action_client.py
     """
     rospy.init_node('action_client_node')
 
