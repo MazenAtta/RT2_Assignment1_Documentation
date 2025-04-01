@@ -3,16 +3,17 @@
 """
 .. module: action_client
    :platform: unix
-   :synopsis: Python module for sending goals to an action server.
+   :synopsis: Python module for sending goals to an action server and publishing robot state.
 .. moduleauthor:: MazenAtta
 
-ROS node that acts as an action client for sending goals to an action server.
+ROS node that acts as an action client for sending goals to an action server, publishing robot state, and last target.
 
 Subscribes to:
     /odom
 
 Publishes to:
-    /reaching_goal/feedback
+    /robot_state
+    /last_target
 
 Clients:
     /reaching_goal
@@ -20,123 +21,129 @@ Clients:
 
 import rospy
 import actionlib
-from assignment2_rt.msg import PlanningAction, PlanningGoal
+from assignment_2_2024.msg import PlanningAction, PlanningGoal
 from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Point
-from std_msgs.msg import String
+from assignment_2_2024.msg import RobotState  # Custom message
+from geometry_msgs.msg import Point  # To publish the last target
 
-# Global variables
-robot_position = Point()
-
-
-def odom_callback(data):
+class ActionClientNode:
     """
-    Callback function to update the robot's position.
+    A ROS node that acts as an action client for sending goals to an action server.
 
-    *Important:* This function is called whenever a new message is received on the /odom topic. It updates the global variable `robot_position` with the latest position data.
-
-    Args:
-        data (Odometry): The odometry data from the /odom topic, which includes the robot's current position and orientation.
+    Attributes:
+        client (SimpleActionClient): The action client instance.
+        state_pub (Publisher): Publisher for the robot state.
+        robot_state (RobotState): The current state of the robot.
+        last_target_pub (Publisher): Publisher for the last target position.
     """
-    global robot_position
-    robot_position = data.pose.pose.position
+    def __init__(self):
+        rospy.init_node('action_client_node')
+        
+        # Action client
+        self.client = actionlib.SimpleActionClient('/reaching_goal', PlanningAction)
+        self.client.wait_for_server()
+        rospy.loginfo("Action server connected!")
 
+        # Publisher for robot state
+        self.state_pub = rospy.Publisher('/robot_state', RobotState, queue_size=10)
+        self.robot_state = RobotState()
 
-def send_goal(client, x, y):
-    """
-    Send a goal to the action server.
+        # Publisher for last target
+        self.last_target_pub = rospy.Publisher('/last_target', Point, queue_size=10)
 
-    *Action:* This function creates a new goal with the specified x and y coordinates and sends it to the action server through the action client.
+        # Subscriber for odometry
+        rospy.Subscriber('/odom', Odometry, self.odom_callback)
 
-    Args:
-        client (SimpleActionClient): The action client used to communicate with the action server.
-        x (float): The x-coordinate of the goal.
-        y (float): The y-coordinate of the goal.
+    def odom_callback(self, msg):
+        """
+        Callback function to update the robot's state.
 
-    Example:
-        send_goal(client, 1.0, 2.0)
-    """
-    goal = PlanningGoal()
-    goal.target_pose.pose.position.x = x
-    goal.target_pose.pose.position.y = y
-    client.send_goal(goal)
-    rospy.loginfo(f"Goal sent: x={x}, y={y}")
+        *Action:* This function is called whenever a new message is received on the /odom topic. It updates and publishes the robot's state.
 
+        Args:
+            msg (Odometry): The odometry data from the /odom topic.
+        """
+        self.robot_state.x = msg.pose.pose.position.x
+        self.robot_state.y = msg.pose.pose.position.y
+        self.robot_state.vel_x = msg.twist.twist.linear.x
+        self.robot_state.vel_z = msg.twist.twist.angular.z
+        self.state_pub.publish(self.robot_state)
 
-def cancel_goal(client):
-    """
-    Cancel the current goal.
+    def send_goal(self, x, y):
+        """
+        Send a goal to the action server.
 
-    *Action:* This function cancels any active goal that has been sent to the action server.
+        *Action:* This function creates a new goal with the specified x and y coordinates, publishes the last target, and sends it to the action server.
 
-    Args:
-        client (SimpleActionClient): The action client used to communicate with the action server.
+        Args:
+            x (float): The x-coordinate of the goal.
+            y (float): The y-coordinate of the goal.
 
-    Example:
-        cancel_goal(client)
-    """
-    client.cancel_goal()
-    rospy.loginfo("Goal cancelled.")
+        Example:
+            send_goal(1.0, 2.0)
+        """
+        # Publish last target to the /last_target topic
+        target_point = Point(x=x, y=y, z=0.0)
+        self.last_target_pub.publish(target_point)
 
+        # Send the goal to the action server
+        goal = PlanningGoal()
+        goal.target_pose.pose.position.x = x
+        goal.target_pose.pose.position.y = y
+        self.client.send_goal(goal)
+        rospy.loginfo(f"Goal sent: ({x}, {y})")
 
-def main():
-    """
-    Main function to initialize the node and handle user input.
+    def feedback_callback(self, feedback):
+        """
+        Callback function to handle feedback from the action server.
 
-    *Action:* This function initializes the ROS node, sets up the action client and subscribers, and handles user input to send or cancel goals.
+        *Action:* This function logs feedback received from the action server.
 
-    Workflow:
-        1. Initialize the ROS node.
-        2. Set up the action client to communicate with the /reaching_goal action server.
-        3. Subscribe to the /odom topic to receive odometry data.
-        4. Create a publisher for custom feedback messages.
-        5. Enter a loop to handle user input for sending or canceling goals.
-        6. Monitor the goal's progress and publish feedback messages.
+        Args:
+            feedback: The feedback data from the action server.
+        """
+        rospy.loginfo(f"Feedback received: {feedback}")
 
-    Example:
-        rosrun package_name action_client.py
-    """
-    rospy.init_node('action_client_node')
+    def cancel_goal(self):
+        """
+        Cancel the current goal.
 
-    # Action client setup
-    client = actionlib.SimpleActionClient('/reaching_goal', PlanningAction)
-    rospy.loginfo("Waiting for action server...")
-    client.wait_for_server()
-    rospy.loginfo("Action server is ready.")
+        *Action:* This function cancels any active goal that has been sent to the action server.
 
-    # Subscriber to /odom
-    rospy.Subscriber('/odom', Odometry, odom_callback)
+        Example:
+            cancel_goal()
+        """
+        self.client.cancel_goal()
+        rospy.loginfo("Goal canceled")
 
-    # Publisher for custom feedback (if required by the repo structure)
-    feedback_pub = rospy.Publisher('/reaching_goal/feedback', String, queue_size=10)
+    def run(self):
+        """
+        Main function to run the node and handle user input.
 
-    rate = rospy.Rate(10)
+        *Action:* This function initializes the ROS node, sets up the action client and subscribers, and handles user input to send or cancel goals.
 
-    while not rospy.is_shutdown():
-        user_input = input("Enter target (x, y) or 'cancel': ")
+        Workflow:
+            1. Initialize the ROS node.
+            2. Set up the action client to communicate with the /reaching_goal action server.
+            3. Subscribe to the /odom topic to receive odometry data.
+            4. Create publishers for robot state and last target.
+            5. Enter a loop to handle user input for sending or canceling goals.
 
-        if user_input.lower() == 'cancel':
-            cancel_goal(client)
-        else:
-            try:
-                x, y = map(float, user_input.split(','))
-                send_goal(client, x, y)
+        Example:
+            rosrun package_name action_client.py
+        """
+        rospy.loginfo("Action Client Node running...")
+        while not rospy.is_shutdown():
+            cmd = input("Enter 's' to send a goal, 'c' to cancel, or 'q' to quit: ")
+            if cmd == 's':
+                x = float(input("Enter target x: "))
+                y = float(input("Enter target y: "))
+                self.send_goal(x, y)
+            elif cmd == 'c':
+                self.cancel_goal()
+            elif cmd == 'q':
+                break
 
-                # Monitor the goal's progress
-                while not client.wait_for_result(timeout=rospy.Duration(1.0)):
-                    feedback_msg = f"Current position: x={robot_position.x:.2f}, y={robot_position.y:.2f}"
-                    rospy.loginfo(feedback_msg)
-                    feedback_pub.publish(feedback_msg)
-
-                rospy.loginfo("Goal reached!")
-            except ValueError:
-                rospy.logerr("Invalid input. Please enter valid x, y coordinates or 'cancel'.")
-
-        rate.sleep()
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+if __name__ == "__main__":
+    node = ActionClientNode()
+    node.run()
