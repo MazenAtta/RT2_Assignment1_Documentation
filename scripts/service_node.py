@@ -4,7 +4,7 @@
 .. module: service_node
    :platform: unix
    :synopsis: Python module for providing the last target coordinates as a service.
-.. moduleauthor:: MazenAtta
+.. moduleauthor:: MazenAtta mazenatta445@gmail.com
 
 ROS node that provides a service to get the last target coordinates.
 
@@ -24,6 +24,7 @@ class TargetServiceNode(Node):
     Attributes:
         srv (Service): The service server instance.
         last_target (Pose): The last target coordinates.
+    
     """
     def __init__(self):
         super().__init__('target_service_node')
@@ -38,6 +39,10 @@ class TargetServiceNode(Node):
         Args:
             x (float): The x-coordinate of the target.
             y (float): The y-coordinate of the target.
+
+        Returns:
+        None
+
         """
         self.last_target.position.x = x
         self.last_target.position.y = y
@@ -65,6 +70,13 @@ class TargetServiceNode(Node):
 def main(args=None):
     """
     Main function to initialize the node and spin.
+
+    Args:
+    None
+
+    Returns:
+    None
+
     """
     rclpy.init(args=args)
     node = TargetServiceNode()

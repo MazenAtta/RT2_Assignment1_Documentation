@@ -4,7 +4,7 @@
 .. module: action_client
    :platform: unix
    :synopsis: Python module for sending goals to an action server.
-.. moduleauthor:: MazenAtta
+.. moduleauthor:: MazenAtta mazenatta445@gmai.com
 
 ROS node that acts as an action client for sending goals to an action server.
 
@@ -35,6 +35,9 @@ def odom_callback(data):
 
     Args:
         data (Odometry): The odometry data from the /odom topic.
+
+    Returns:
+    None
     """
     global robot_position
     robot_position = data.pose.pose.position
@@ -48,6 +51,10 @@ def send_goal(client, x, y):
         client (SimpleActionClient): The action client.
         x (float): The x-coordinate of the goal.
         y (float): The y-coordinate of the goal.
+    
+    Returns:
+    None
+
     """
     goal = PlanningGoal()
     goal.target_pose.pose.position.x = x
@@ -62,6 +69,10 @@ def cancel_goal(client):
 
     Args:
         client (SimpleActionClient): The action client.
+
+    Returns:
+    None
+
     """
     client.cancel_goal()
     rospy.loginfo("Goal cancelled.")
@@ -70,6 +81,13 @@ def cancel_goal(client):
 def main():
     """
     Main function to initialize the node and handle user input.
+
+    Args:
+    None
+
+    Returns:
+    None
+    
     """
     rospy.init_node('action_client_node')
 
